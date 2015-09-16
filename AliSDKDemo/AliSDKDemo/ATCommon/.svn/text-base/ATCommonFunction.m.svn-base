@@ -1,0 +1,106 @@
+
+#import "ATCommonFunction.h"
+
+@implementation ATCommonFunction
+
++ (NSString *)ATGetselfPhotoPath
+{
+    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory,NSUserDomainMask,YES);
+    NSString *documentsDirectory = [paths objectAtIndex:0];
+    return [documentsDirectory stringByAppendingPathComponent:@"selfPhoto.png"];
+}
+
++ (void)ATGetNsUserDefaultSetting
+{
+    NSDictionary* defaults = [[NSUserDefaults standardUserDefaults] dictionaryRepresentation];
+    ATLog(@"Defaults-->: %@", defaults);
+}
+
++ (BOOL)ATgetUserIsLogin
+{
+   NSString *islogin =  [[NSUserDefaults standardUserDefaults] objectForKey:@"isLogin"];
+    if ([islogin isEqualToString:@"YES"]) {
+        return YES;
+    }else{
+        return NO;
+    }
+}
+
++ (NSString *)ATgetUserName
+{
+   return [[NSUserDefaults standardUserDefaults] objectForKey:@"userName"];
+}
+
++ (NSString *)ATgetUserEmail
+{
+    return [[NSUserDefaults standardUserDefaults] objectForKey:@"userEmail"];
+}
+
++ (UIButton *)ATgetRoundImgae:(UIButton *)image iconWidth:(CGFloat)kIconWidth
+{
+    image.imageView.layer.cornerRadius= kIconWidth/2;
+    image.imageView.layer.masksToBounds= YES;
+    return image;
+}
+
+
++ (UIColor *) colorWithHexString: (NSString *) stringToConvert
+
+{
+    NSString *cString = [[stringToConvert stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString]; //去掉前后空格换行符
+    // String should be 6 or 8 characters
+    if ([cString length] < 6) return [UIColor redColor];
+    // strip 0X if it appears
+    if ([cString hasPrefix:@"0X"]) cString = [cString substringFromIndex:2];
+    if ([cString hasPrefix:@"#"]) cString = [cString substringFromIndex:1];
+    if ([cString length] != 6) return [UIColor redColor];
+    // Separate into r, g, b substrings
+    NSRange range;
+    range.location = 0;
+    range.length = 2;
+    NSString *rString = [cString substringWithRange:range];
+    range.location = 2;
+    NSString *gString = [cString substringWithRange:range];
+    range.location = 4;
+    NSString *bString = [cString substringWithRange:range];
+    // Scan values
+    unsigned int r, g, b;
+    [[NSScanner scannerWithString:rString] scanHexInt:&r];  //扫描16进制到int
+    [[NSScanner scannerWithString:gString] scanHexInt:&g];
+    [[NSScanner scannerWithString:bString] scanHexInt:&b];
+    return [UIColor colorWithRed:((float) r / 255.0f)
+                           green:((float) g / 255.0f)
+                            blue:((float) b / 255.0f)
+                           alpha:1.0f];
+}
+
++(NSMutableAttributedString *)ATgetAttributeWithString:(NSString *)string
+{
+    
+    //每三位一个逗号
+//    NSNumberFormatter *formater = [[NSNumberFormatter alloc] init];
+//    formater.numberStyle = NSNumberFormatterDecimalStyle;
+//    NSString *string = [formater stringFromNumber:[NSNumber numberWithFloat:1234567]];
+//    NSString *s =  [NSString stringWithFormat:@"￥%@",string];
+    
+    NSInteger strLocation =  [string rangeOfString:@"."].location;
+    NSMutableAttributedString *attribute;
+    //外部进来的数据先判断是否有小数点
+    if (strLocation!=NSNotFound){
+        //如果是有小数点的
+        attribute = [[NSMutableAttributedString alloc] initWithString:string];
+        [attribute addAttribute:
+         NSFontAttributeName
+         value:[UIFont fontWithName:nil size:16]
+         range:NSMakeRange(0,strLocation)];
+    }else {
+        attribute = [[NSMutableAttributedString alloc] initWithString:string];
+        [attribute addAttribute:
+         NSFontAttributeName
+                          value:[UIFont fontWithName:nil size:16]
+                          range:NSMakeRange(0,string.length)];
+    }
+    return attribute;
+}
+
+@end
